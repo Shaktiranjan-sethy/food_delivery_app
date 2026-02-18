@@ -8,6 +8,7 @@ import { signInWithPopup } from "firebase/auth";
 import { auth, provider } from "../../utils/firebase";
 import { useDispatch } from "react-redux";
 import { setUserData } from "../redux/userSlice";
+import { ToastContainer, toast } from 'react-toastify';
 
 export default function SignIn() {
   const [showPassword, setShowPassword] = useState(false);
@@ -19,7 +20,7 @@ export default function SignIn() {
   const hoverColor = "#e64323"; // darker orange
   const bgColor = "#fff9f6"; // light off-white background
   const borderColor = "#ddd";
-const dispatch=useDispatch()
+  const dispatch = useDispatch()
   const handleSignIn = async () => {
     try {
       const result = await axios.post(
@@ -27,7 +28,16 @@ const dispatch=useDispatch()
         { email, password },
         { withCredentials: true }
       );
-     dispatch(setUserData(result.data))
+      console.log(result);
+      if (result?.data?.status == 1) {
+        toast.success(result?.data?.message);
+        setTimeout(() => {
+          dispatch(setUserData(result.data.user));
+        }, 2000)
+      } else {
+        toast.error(result?.data?.message);
+      }
+
     } catch (error) {
       console.log(error);
     }
@@ -37,11 +47,11 @@ const dispatch=useDispatch()
     try {
       const result = await signInWithPopup(auth, provider);
       console.log(result);
-      if(result){
-        const {data}=await axios.post(`${serverUrl}/api/auth/googleauth`,{
-          email:result.user.email,
-        },{withCredentials:true})
-         dispatch(setUserData(data))
+      if (result) {
+        const { data } = await axios.post(`${serverUrl}/api/auth/googleauth`, {
+          email: result.user.email,
+        }, { withCredentials: true })
+        dispatch(setUserData(data))
       }
 
     } catch (error) {
@@ -154,6 +164,7 @@ const dispatch=useDispatch()
           </Link>
         </p>
       </div>
+      <ToastContainer />
     </div>
   );
 }

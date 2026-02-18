@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 import { useDispatch } from "react-redux";
-import { setCity } from "../redux/userSlice";
+import { setAddress, setCity, setState } from "../redux/userSlice";
 
 function getCity() {
   const dispatch = useDispatch();
@@ -18,9 +18,8 @@ function getCity() {
 
         console.log(`Latitude: ${lat}, Longitude: ${lon}`);
 
-        try {
-          // 🔑 apna Geoapify API key yaha lagao
-          const apiKey = "812d749999de462e9df7ca070383975b";
+        try { 
+          const apiKey = "2857dea74bcb4d17a92e68e33422442b";
 
           const response = await fetch(
             `https://api.geoapify.com/v1/geocode/reverse?lat=${lat}&lon=${lon}&apiKey=${apiKey}`
@@ -33,8 +32,10 @@ function getCity() {
             data?.features?.[0]?.properties?.village ||
             data?.features?.[0]?.properties?.state ||
             "Unknown";
-
-          dispatch(setCity(city));
+          console.log(data);
+          dispatch(setCity( data?.features?.[0]?.properties?.city));
+          dispatch(setState( data?.features?.[0]?.properties?.state));
+          dispatch(setAddress( data?.features?.[0]?.properties?.address_line2));
         } catch (err) {
           console.error("Error fetching city name:", err);
         }

@@ -6,16 +6,19 @@ import { FaUtensils, FaPen, FaPlus } from "react-icons/fa";
 import Footer from './Footer'
 import OwnerFoodCard from './OwnerFoodCard'
 import { useEffect } from 'react';
-import { setPendingOrdersCount } from '../redux/userSlice';
+import { setPendingOrdersCount } from '../redux/userSlice'; 
 
 function OwnerDashboard() {
-  const { shop,ownerPendingOrders } = useSelector(state => state.user)
+  const { shop, ownerPendingOrders, userData } = useSelector(state => state.user)
+  //console.log("shop",shop);
   const navigate = useNavigate()
-  const dispatch=useDispatch()
-useEffect(()=>{
+  const dispatch = useDispatch()
+  useEffect(() => {
     const pending = ownerPendingOrders.filter(order => order.shopOrder.status === "pending");
-        dispatch(setPendingOrdersCount(pending.length));
-},[ownerPendingOrders])
+    dispatch(setPendingOrdersCount(pending.length));
+  }, [ownerPendingOrders])
+
+  
   return (
     <div className='w-full min-h-screen bg-[#fff9f6] flex flex-col items-center'>
       <Nav />
@@ -33,7 +36,7 @@ useEffect(()=>{
                 Join our food delivery platform and reach thousands of hungry customers every day.
               </p>
               <button
-                className="bg-[#ff4d2d] text-white px-5 sm:px-6 py-2 rounded-full font-medium shadow-md hover:bg-orange-600 transition-colors duration-200"
+                className="bg-[#ff4d2d] text-white px-5 sm:px-6 py-2 rounded-full cursor-pointer font-medium shadow-md hover:bg-orange-600 transition-colors duration-200"
                 onClick={() => navigate("/editshop")}
               >
                 Get Started
@@ -54,7 +57,7 @@ useEffect(()=>{
           <div className="bg-white shadow-lg rounded-xl overflow-hidden border border-orange-100 hover:shadow-2xl transition-all duration-300 w-full max-w-3xl relative">
             <button
               onClick={() => navigate("/editshop")}
-              className="absolute top-4 right-4 bg-[#ff4d2d] text-white p-2 rounded-full shadow-md hover:bg-orange-600 transition-colors"
+              className="absolute top-4 right-4 bg-[#ff4d2d] text-white p-2 rounded-full cursor-pointer shadow-md hover:bg-orange-600 transition-colors"
             >
               <FaPen />
             </button>
@@ -83,7 +86,7 @@ useEffect(()=>{
                 Share your delicious creations with our customers by adding them to the menu.
               </p>
               <button
-                className="inline-flex items-center gap-2 bg-orange-500 text-white px-5 sm:px-6 py-2 sm:py-3 rounded-full font-semibold shadow-md hover:bg-orange-600 transition-colors"
+                className="inline-flex items-center gap-2 bg-orange-500 text-white cursor-pointer px-5 sm:px-6 py-2 sm:py-3 rounded-full font-semibold shadow-md hover:bg-orange-600 transition-colors"
                 onClick={() => navigate("/additem")}
               >
                 <FaPlus /> Add Item
@@ -93,48 +96,46 @@ useEffect(()=>{
         </div>
       )}
 
-     {/* If shop and items exist */}
-{shop && shop?.items.length > 0 && (
-  <div className='w-full flex flex-col gap-6 items-center px-4 sm:px-6 mb-[20px]'>
-    <h1 className="text-2xl sm:text-3xl text-gray-900 flex items-center gap-3 mt-8 text-center">
-      <FaUtensils className="text-[#ff4d2d]" /> Welcome to {shop.name}
-    </h1>
+      {/* If shop and items exist */}
+      {shop && shop?.items.length > 0 && (
+        <div className='w-full flex flex-col gap-6 items-center px-4 sm:px-6 mb-[20px]'>
+          <h1 className="text-2xl sm:text-3xl text-gray-900 flex items-center gap-3 mt-8 text-center">
+            <FaUtensils className="text-[#ff4d2d]" /> Welcome to {shop.name}
+          </h1>
 
-    {/* Shop Card */}
-    <div className="bg-white shadow-lg rounded-xl overflow-hidden border border-orange-100 hover:shadow-2xl transition-all duration-300 w-full max-w-3xl relative">
-      <button
-        onClick={() => navigate("/editshop")}
-        className="absolute top-4 right-4 bg-[#ff4d2d] text-white p-2 rounded-full shadow-md hover:bg-orange-600 transition-colors"
-      >
-        <FaPen />
-      </button>
-      <img
-        src={shop.image}
-        alt={shop.name}
-        className="w-full h-48 sm:h-64 object-cover"
-      />
-      <div className="p-4 sm:p-6">
-        <h2 className="text-xl sm:text-2xl font-bold text-gray-800 mb-2">{shop.name}</h2>
-        <p className="text-gray-500 mb-4">{shop.city}, {shop.state}</p>
-        <p className="text-gray-700 mb-4">{shop.address}</p>
-        <div className="text-xs sm:text-sm text-gray-400">
-          <p>Created: {new Date(shop.createdAt).toLocaleString()}</p>
-          <p>Last Updated: {new Date(shop.updatedAt).toLocaleString()}</p>
+          {/* Shop Card */}
+          <div className="bg-white shadow-lg rounded-xl overflow-hidden border border-orange-100 hover:shadow-2xl transition-all duration-300 w-full max-w-3xl relative">
+            <button
+              onClick={() => navigate("/editshop")}
+              className="absolute top-4 right-4 bg-[#ff4d2d] text-white p-2 cursor-pointer rounded-full shadow-md hover:bg-orange-600 transition-colors"
+            >
+              <FaPen />
+            </button>
+            <img
+              src={shop.image}
+              alt={shop.name}
+              className="w-full h-48 sm:h-64 object-cover"
+            />
+            <div className="p-4 sm:p-6">
+              <h2 className="text-xl sm:text-2xl font-bold text-gray-800 mb-2">{shop.name}</h2>
+              <p className="text-gray-500 mb-4">{shop.city}, {shop.state}</p>
+              <p className="text-gray-700 mb-4">{shop.address}</p>
+              <div className="text-xs sm:text-sm text-gray-400">
+                <p>Created: {new Date(shop.createdAt).toLocaleString()}</p>
+                <p>Last Updated: {new Date(shop.updatedAt).toLocaleString()}</p>
+              </div>
+            </div>
+          </div>
+
+          {/* Food Items - one per row */}
+          <div className="flex flex-col items-center gap-4 w-full max-w-3xl ">
+            {shop?.items.map((item, index) => (
+              <OwnerFoodCard key={index} item={item} />
+            ))}
+          </div>
         </div>
-      </div>
-    </div>
-
-    {/* Food Items - one per row */}
-    <div className="flex flex-col items-center gap-4 w-full max-w-3xl ">
-      {shop?.items.map((item, index) => (
-        <OwnerFoodCard key={index} item={item} />
-      ))}
-    </div>
-  </div>
-)}
-
-
-    
+      )}
+ 
     </div>
   )
 }

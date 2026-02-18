@@ -13,6 +13,7 @@ const fetchItems=async ()=>{
     const result=await axios.get(`${serverUrl}/api/item/getitemsbycity/${city}`,{withCredentials:true})
      dispatch(setItemsOfCity(result.data))
      console.log(result.data)
+     //console.log(city)
  }
  fetchItems() 
 }

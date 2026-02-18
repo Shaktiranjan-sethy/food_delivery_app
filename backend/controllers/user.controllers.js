@@ -2,18 +2,18 @@ import Item from "../models/item.model.js"
 import Shop from "../models/shop.model.js"
 import User from "../models/user.model.js"
 
-export const getCurrentUser=async (req,res)=>{
-    try {
-        const userId=req.userId
-        const user=await User.findById(userId)
-        if(!user){
-            return res.status(400).json({message:"user not found"})
-        }
-
-        return res.status(200).json(user)
-    } catch (error) {
-        return res.status(500).json({message:`get current user error ${error}`})
+export const getCurrentUser = async (req, res) => {
+  try {
+    const userId = req.userId
+    const user = await User.findById(userId)
+    if (!user) {
+      return res.status(400).json({ message: "user not found" })
     }
+
+    return res.status(200).json(user)
+  } catch (error) {
+    return res.status(500).json({ message: `get current user error ${error}` })
+  }
 }
 
 // controllers/location.controller.j
@@ -35,7 +35,7 @@ export const updateUserLocation = async (req, res) => {
         type: "Point",
         coordinates: [longitude, latitude]
       }
-    },{new:true});
+    }, { new: true });
 
     // Socket se broadcast karo (agar real-time chahiye)
     const io = req.app.get("io");
@@ -67,8 +67,8 @@ export const updateUserLocation = async (req, res) => {
 export const searchItems = async (req, res) => {
   try {
     const { query, city } = req.query;
-  console.log(query)
-   console.log(city)
+    console.log(query)
+    console.log(city)
     if (!query) {
       return res.status(400).json({ message: "Search query is required" });
     }
@@ -78,8 +78,8 @@ export const searchItems = async (req, res) => {
 
     // पहले उस city के सारे shop IDs निकालो
     const shopsInCity = await Shop.find({
-  city: { $regex: new RegExp(`^${city}$`, "i") }
-});
+      city: { $regex: new RegExp(`^${city}$`, "i") }
+    });
 
 
     if (shopsInCity.length === 0) {

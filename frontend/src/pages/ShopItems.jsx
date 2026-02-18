@@ -19,7 +19,21 @@ function ShopItems() {
         { withCredentials: true }
       );
       setItems(result.data || []);
-      setShop(result.data[0].shop || null);
+
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+    const handleGetShop = async () => {
+    try {
+      const result = await axios.get(
+        `${serverUrl}/api/shop/getshopbyid/${shopId}`,
+        { withCredentials: true }
+      );
+    
+      setShop(result.data);
+  console.log(result.data)
     } catch (error) {
       console.log(error);
     }
@@ -27,6 +41,7 @@ function ShopItems() {
 
   useEffect(() => {
     handleGetShopItems();
+    handleGetShop()
   }, [shopId]);
 
   return (

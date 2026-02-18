@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { MdLocationOn, MdOutlineCheckCircle } from "react-icons/md";
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
 import Nav from "./Nav";
 import { serverUrl } from "../App";
 import DeliveryBoyTracking from "../pages/DeliveryBoyTracking";
@@ -13,7 +13,7 @@ import {
   Tooltip,
   ResponsiveContainer,
   CartesianGrid,
-} from "recharts";
+} from "recharts"; 
 
 const PRIMARY = "#ff4d2d";
 
@@ -22,9 +22,21 @@ export default function DeliveryBoy() {
   const [assignments, setAssignments] = useState([]);
   const [currentOrder, setCurrentOrder] = useState(null);
   const [todayStats, setTodayStats] = useState([]);
-  const { userData } = useSelector((state) => state.user);
+  const { userData, socket } = useSelector((state) => state.user);
   const [showOtpBox, setShowOtpBox] = useState(false);
   const [otp, setOtp] = useState("");
+
+  const dispatch = useDispatch();
+
+  // useEffect(() => {
+  //   console.log("UPDATED userData", userData);
+  // }, [userData]);
+
+   
+
+  if (!userData?._id) {
+    return <div className="pt-[120px] text-gray-600">Loading dashboard...</div>;
+  }  
 
   // 🔹 Track browser GPS and update backend
   useEffect(() => {
@@ -71,9 +83,19 @@ export default function DeliveryBoy() {
     };
 
     fetchAssignments();
-    const interval = setInterval(fetchAssignments, 2000);
-    return () => clearInterval(interval);
-  }, []);
+
+    socket?.on("delivery:newAssignment", (data) => {
+      if (data.sentTo === userData._id) {
+        dispatch(setAssignments([...assignments, data]));
+      }
+    });
+
+    return () => {
+      socket?.off("delivery:newAssignment");
+    };
+    // const interval = setInterval(fetchAssignments, 2000);
+    // return () => clearInterval(interval);
+  }, [userData, socket]);
 
   // 🔹 Fetch current order
   useEffect(() => {
@@ -294,7 +316,7 @@ export default function DeliveryBoy() {
             </div>
           </div>
         )}
-      </div>
+      </div> 
     </div>
   );
 }

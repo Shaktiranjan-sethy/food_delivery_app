@@ -6,7 +6,7 @@ export default function useCurrentLocation() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
-  const GEOAPIFY_API_KEY = "812d749999de462e9df7ca070383975b"; // apna API key
+  const GEOAPIFY_API_KEY = "2857dea74bcb4d17a92e68e33422442b"; // apna API key
 
   // Reverse geocode with Geoapify
   const reverseGeocode = async (lat, lng) => {

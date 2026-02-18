@@ -31,7 +31,8 @@ function Recenter({ lat, lng }) {
 }
 
 export default function CheckoutPage() {
-  const { cartItems,userData } = useSelector((s) => s.user);
+  const { cartItems, userData } = useSelector((s) => s.user);
+ // console.log(cartItems);
   const { location, address, loading, error, getCurrentLocation, setLocation, reverseGeocode } =
     useCurrentLocation();
 
@@ -73,6 +74,7 @@ export default function CheckoutPage() {
 
   // Marker drag
   const onDragEnd = (e) => {
+    //console.log(e.target.getLatLng());
     const { lat, lng } = e.target.getLatLng();
     setLocation({ lat, lng });
     reverseGeocode(lat, lng);
@@ -95,7 +97,7 @@ export default function CheckoutPage() {
       );
 
       const orderId = res.data.orderId; // assume backend returns { order, razorpayOrder }
-    
+
 
       if (method === "cod") {
         navigate("/order-placed");
@@ -111,7 +113,7 @@ export default function CheckoutPage() {
 
   const openRazorpay = (orderId, razorpayOrder) => {
     const options = {
-      key:"rzp_test_R8OFNIx0dn0Ggd", // Razorpay key id from env
+      key: import.meta.env.VITE_RAZORPAY_KEY_ID, // Razorpay key id from env
       amount: razorpayOrder?.amount, // in paise
       currency: "INR",
       name: "Vingo",
@@ -230,9 +232,8 @@ export default function CheckoutPage() {
             <button
               type="button"
               onClick={() => setMethod("cod")}
-              className={`flex items-center gap-3 rounded-xl border p-4 text-left transition ${
-                method === "cod" ? "border-[#ff4d2d] bg-orange-50 shadow" : "border-gray-200 hover:border-gray-300"
-              }`}
+              className={`flex items-center gap-3 rounded-xl border p-4 text-left transition ${method === "cod" ? "border-[#ff4d2d] bg-orange-50 shadow" : "border-gray-200 hover:border-gray-300"
+                }`}
             >
               <span className="inline-flex h-10 w-10 items-center justify-center rounded-full bg-green-100">
                 <MdDeliveryDining className="text-green-600 text-xl" />
@@ -247,9 +248,8 @@ export default function CheckoutPage() {
             <button
               type="button"
               onClick={() => setMethod("online")}
-              className={`flex items-center gap-3 rounded-xl border p-4 text-left transition ${
-                method === "online" ? "border-[#ff4d2d] bg-orange-50 shadow" : "border-gray-200 hover:border-gray-300"
-              }`}
+              className={`flex items-center gap-3 rounded-xl border p-4 text-left transition ${method === "online" ? "border-[#ff4d2d] bg-orange-50 shadow" : "border-gray-200 hover:border-gray-300"
+                }`}
             >
               <span className="inline-flex h-10 w-10 items-center justify-center rounded-full bg-purple-100">
                 <FaMobileAlt className="text-purple-700 text-lg" />
@@ -293,7 +293,7 @@ export default function CheckoutPage() {
           </div>
         </section>
 
-            <button
+        <button
           className="w-full bg-[#ff4d2d] hover:bg-[#e64526] text-white py-3 rounded-xl font-semibold"
           onClick={handlePlaceOrder}
         >

@@ -5,7 +5,7 @@ import { MdKeyboardBackspace } from "react-icons/md";
 import { useNavigate } from "react-router-dom";
 export default function MyDeliveredOrders() {
   const [orders, setOrders] = useState([]);
-const navigate=useNavigate()
+  const navigate = useNavigate()
   useEffect(() => {
     const fetchDeliveredOrders = async () => {
       try {
@@ -40,11 +40,11 @@ const navigate=useNavigate()
   return (
     <div className="p-6 max-w-5xl mx-auto">
       <h2 className="text-2xl font-bold mb-6 text-gray-800 flex items-center">
-   
-                    <div onClick={() => navigate("/")} className="cursor-pointer">
-                      <MdKeyboardBackspace className="w-[25px] h-[25px] text-[#ff4d2d]" />
-                    </div>
-                   
+
+        <div onClick={() => navigate("/")} className="cursor-pointer">
+          <MdKeyboardBackspace className="w-[25px] h-[25px] text-[#ff4d2d]" />
+        </div>
+
         <span className="mr-2">📦</span>
         <span style={{ color: "#ff4d2d" }}>My Delivered Orders</span>
       </h2>

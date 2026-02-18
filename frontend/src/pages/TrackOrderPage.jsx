@@ -9,7 +9,7 @@ const PRIMARY = "#ff4d2d";
 export default function TrackOrderPage() {
   const { orderId } = useParams();
   const [order, setOrder] = useState(null);
-const navigate=useNavigate()
+  const navigate = useNavigate()
   const fetchOrder = async () => {
     try {
       const res = await axios.get(`${serverUrl}/api/order/${orderId}`, {
@@ -34,11 +34,11 @@ const navigate=useNavigate()
   return (
     <div className="max-w-4xl mx-auto p-4 flex flex-col gap-6">
       <div className="flex gap-[20px] items-center mb-6 md:justify-center">
-                  <div onClick={() => navigate("/")} className="cursor-pointer">
-                    <MdKeyboardBackspace className="w-[25px] h-[25px] text-[#ff4d2d]" />
-                  </div>
-                  <h1 className="text-2xl font-bold md:text-center">Track Order</h1>
-                </div>
+        <div onClick={() => navigate("/")} className="cursor-pointer">
+          <MdKeyboardBackspace className="w-[25px] h-[25px] text-[#ff4d2d]" />
+        </div>
+        <h1 className="text-2xl font-bold md:text-center">Track Order</h1>
+      </div>
       {order.shopOrders.map((shopOrder) => (
         <div
           key={shopOrder._id}

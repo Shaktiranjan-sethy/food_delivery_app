@@ -21,11 +21,11 @@ const statusOptions = ["pending", "preparing", "out of delivery"];
 
 export default function PendingOrders() {
   const dispatch = useDispatch();
-  const navigate=useNavigate()
-  const { ownerPendingOrders, deliveryBoys ,socket} = useSelector(
+  const navigate = useNavigate()
+  const { ownerPendingOrders, deliveryBoys, socket } = useSelector(
     (state) => state.user
   );
-
+ console.log("owners order:",ownerPendingOrders);
   // update local redux orders
   const updateLocalShopOrder = (orderId, shopId, updatedShopOrder) => {
     if (!ownerPendingOrders) return;
@@ -50,6 +50,8 @@ export default function PendingOrders() {
         { withCredentials: true }
       );
 
+      console.log(res.data);
+
       if (!res?.data?.success) {
         console.error("Update failed:", res?.data);
         return;
@@ -70,7 +72,7 @@ export default function PendingOrders() {
     }
   };
 
-  
+
   // render no orders
   if (!ownerPendingOrders || ownerPendingOrders.length === 0) {
     return (
@@ -97,24 +99,24 @@ export default function PendingOrders() {
   }
 
   return (
-   <div className="max-w-6xl mx-auto p-4">
-   <div className="flex gap-[20px] items-center mb-6 md:justify-center">
-            <div onClick={() => navigate("/")} className="cursor-pointer">
-              <MdKeyboardBackspace className="w-[25px] h-[25px] text-[#ff4d2d]" />
-            </div>
-            <h1 className="text-2xl font-bold md:text-center">My Orders</h1>
-          </div>
+    <div className="max-w-6xl mx-auto p-4">
+      <div className="flex gap-[20px] items-center mb-6 md:justify-center">
+        <div onClick={() => navigate("/")} className="cursor-pointer">
+          <MdKeyboardBackspace className="w-[25px] h-[25px] text-[#ff4d2d]" />
+        </div>
+        <h1 className="text-2xl font-bold md:text-center">My Orders</h1>
+      </div>
 
-  <div className="flex flex-col items-center gap-6">
-    {ownerPendingOrders?.map((order) => {
-      const orderId = order._id;
-      const shopId = order.shopOrder?.shop?._id;
+      <div className="flex flex-col items-center gap-6">
+        {ownerPendingOrders?.map((order) => {
+          const orderId = order._id;
+          const shopId = order.shopOrder?.shop?._id;
 
-      return (
-        <div
-          key={orderId}
-          className="w-full max-w-[800px] bg-white rounded-2xl border border-orange-100 shadow-sm hover:shadow-md transition-all p-5 flex flex-col gap-4"
-        >
+          return (
+            <div
+              key={orderId}
+              className="w-full max-w-[800px] bg-white rounded-2xl border border-orange-100 shadow-sm hover:shadow-md transition-all p-5 flex flex-col gap-4"
+            >
               {/* Customer Info */}
               <div>
                 <h2 className="text-lg font-semibold text-gray-800">
@@ -170,39 +172,39 @@ export default function PendingOrders() {
                 </div>
               </div>
 
-             {/* Status */}
-<div className="flex justify-between items-center mt-auto pt-3 border-t border-gray-100">
-  <span className="text-sm">
-    Status:{" "}
-    <span
-      className="font-semibold capitalize"
-      style={{ color: PRIMARY }}
-    >
-      {order.shopOrder?.status}
-    </span>
-  </span>
+              {/* Status */}
+              <div className="flex justify-between items-center mt-auto pt-3 border-t border-gray-100">
+                <span className="text-sm">
+                  Status:{" "}
+                  <span
+                    className="font-semibold capitalize"
+                    style={{ color: PRIMARY }}
+                  >
+                    {order.shopOrder?.status}
+                  </span>
+                </span>
 
-  {/* 👉 Hide select if already delivered */}
-  {order.shopOrder?.status !== "delivered" && (
-    <select
-      className="rounded-md border px-3 py-1 text-sm focus:outline-none focus:ring-2"
-      style={{ borderColor: PRIMARY, color: PRIMARY }}
-      onChange={(e) =>
-        updateStatus(orderId, shopId, e.target.value)
-      }
-      defaultValue=""
-    >
-      <option value="" disabled>
-        Change
-      </option>
-      {statusOptions.map((st) => (
-        <option key={st} value={st} className="text-gray-700">
-          {st}
-        </option>
-      ))}
-    </select>
-  )}
-</div>
+                {/* 👉 Hide select if already delivered */}
+                {order.shopOrder?.status !== "delivered" && (
+                  <select
+                    className="rounded-md border px-3 py-1 text-sm focus:outline-none focus:ring-2"
+                    style={{ borderColor: PRIMARY, color: PRIMARY }}
+                    onChange={(e) =>
+                      updateStatus(orderId, shopId, e.target.value)
+                    }
+                    defaultValue=""
+                  >
+                    <option value="" disabled>
+                      Change
+                    </option>
+                    {statusOptions.map((st) => (
+                      <option key={st} value={st} className="text-gray-700">
+                        {st}
+                      </option>
+                    ))}
+                  </select>
+                )}
+              </div>
               {/* Delivery Boys */}
               {order.shopOrder?.status === "out of delivery" && (
                 <div className="mt-3 p-2 border rounded-lg text-sm bg-orange-50">

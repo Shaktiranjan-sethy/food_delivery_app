@@ -6,17 +6,17 @@ import { serverUrl } from '../App';
 import { useDispatch } from 'react-redux';
 import { setShop } from '../redux/userSlice';
 
-export default function OwnerFoodCard({ item}) {
-    const navigate=useNavigate()
-    const dispatch=useDispatch()
-    const handleDelete=async ()=>{
-        try {
-            const result=await axios.get(`${serverUrl}/api/item/delete/${item._id}`,{withCredentials:true})
-dispatch(setShop(result.data.shop))
-        } catch (error) {
-            console.log(error)
-        }
+export default function OwnerFoodCard({ item }) {
+  const navigate = useNavigate()
+  const dispatch = useDispatch()
+  const handleDelete = async () => {
+    try {
+      const result = await axios.get(`${serverUrl}/api/item/delete/${item._id}`, { withCredentials: true })
+      dispatch(setShop(result.data.shop))
+    } catch (error) {
+      console.log(error)
     }
+  }
   return (
     <div className="flex bg-white rounded-lg shadow-md overflow-hidden border border-[#ff4d2d] w-full max-w-2xl">
       <div className="w-36 h-[full] flex-shrink-0 bg-gray-50">
@@ -42,14 +42,14 @@ dispatch(setShop(result.data.shop))
           <span className="text-[#ff4d2d] font-bold">₹{item.price}</span>
           <div className="flex items-center gap-2">
             <button
-              onClick={() =>navigate(`/editItem/${item._id}`)}
-              className="p-2 rounded-full hover:bg-[#ff4d2d]/10 text-[#ff4d2d]"
+              onClick={() => navigate(`/editItem/${item._id}`)}
+              className="p-2 cursor-pointer rounded-full hover:bg-[#ff4d2d]/10 text-[#ff4d2d]"
             >
               <FiEdit size={16} />
             </button>
             <button
-             
-              className="p-2 rounded-full hover:bg-[#ff4d2d]/10 text-[#ff4d2d]"
+
+              className="p-2 cursor-pointer rounded-full hover:bg-[#ff4d2d]/10 text-[#ff4d2d]"
               onClick={handleDelete}
             >
               <FiTrash2 size={16} />

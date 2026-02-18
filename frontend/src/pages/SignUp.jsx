@@ -16,6 +16,7 @@ export default function SignUp() {
   const [email, setEmail] = useState("");
   const [mobile, setMobile] = useState("");
   const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState(false);
 
   const primaryColor = "#ff4d2d";
   const hoverColor = "#e64323";
@@ -26,46 +27,48 @@ export default function SignUp() {
 
   const handleSignUp = async () => {
     try {
+      setLoading(true);
       const result = await axios.post(
         `${serverUrl}/api/auth/signup`,
         { fullName, email, mobile, password, role },
         { withCredentials: true }
       );
       dispatch(setUserData(result.data));
+      setLoading(false);
     } catch (error) {
       console.log(error);
     }
   };
 
   const handleGoogleAuth = async () => {
-  try {
-    let mobileNumber = mobile;
+    try {
+      let mobileNumber = mobile;
 
-    if (!mobileNumber) {
-      mobileNumber = prompt("Please enter your mobile number:");
-     
-      setMobile(mobileNumber);
+      if (!mobileNumber) {
+        mobileNumber = prompt("Please enter your mobile number:");
+
+        setMobile(mobileNumber);
+      }
+
+      const result = await signInWithPopup(auth, provider);
+
+      if (result) {
+        const { data } = await axios.post(
+          `${serverUrl}/api/auth/googleauth`,
+          {
+            fullName: result.user.displayName,
+            email: result.user.email,
+            mobile: mobileNumber, // ✅ directly use local var
+            role,
+          },
+          { withCredentials: true }
+        );
+        dispatch(setUserData(data));
+      }
+    } catch (error) {
+      console.log(error);
     }
-
-    const result = await signInWithPopup(auth, provider);
-
-    if (result) {
-      const { data } = await axios.post(
-        `${serverUrl}/api/auth/googleauth`,
-        {
-          fullName: result.user.displayName,
-          email: result.user.email,
-          mobile: mobileNumber, // ✅ directly use local var
-          role,
-        },
-        { withCredentials: true }
-      );
-      dispatch(setUserData(data));
-    }
-  } catch (error) {
-    console.log(error);
-  }
-};
+  };
 
 
 
@@ -145,7 +148,7 @@ export default function SignUp() {
             <button
               type="button"
               onClick={() => setShowPassword(!showPassword)}
-              className="absolute right-3 top-2.5 text-gray-500"
+              className="absolute right-3 top-2.5 text-gray-500 cursor-pointer"
             >
               {showPassword ? <FaEyeSlash size={20} /> : <FaEye size={20} />}
             </button>
@@ -161,7 +164,7 @@ export default function SignUp() {
                 key={r}
                 type="button"
                 onClick={() => setRole(r)}
-                className="flex-1 border rounded-lg px-3 py-2 text-center font-medium transition-colors"
+                className="flex-1 border rounded-lg px-3 py-2 text-center font-medium transition-colors cursor-pointer"
                 style={
                   role === r
                     ? { backgroundColor: primaryColor, color: "white" }
@@ -176,7 +179,7 @@ export default function SignUp() {
 
         {/* Sign Up Button */}
         <button
-          className="w-full font-semibold py-2 rounded-lg transition duration-200"
+          className="w-full font-semibold py-2 rounded-lg transition duration-200 cursor-pointer"
           style={{ backgroundColor: primaryColor, color: "white" }}
           onMouseOver={(e) =>
             (e.currentTarget.style.backgroundColor = hoverColor)
@@ -186,12 +189,12 @@ export default function SignUp() {
           }
           onClick={handleSignUp}
         >
-          Sign Up
+           {loading ? "Signing Up.." : "Sign Up" }
         </button>
 
         {/* Google Auth */}
         <button
-          className="w-full mt-4 flex items-center justify-center gap-2 border rounded-lg px-4 py-2 transition duration-200"
+          className="w-full mt-4 flex items-center justify-center gap-2 border rounded-lg px-4 py-2 transition duration-200 cursor-pointer"
           style={{ borderColor }}
           onClick={handleGoogleAuth}
         >

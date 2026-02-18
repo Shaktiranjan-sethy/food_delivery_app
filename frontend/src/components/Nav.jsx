@@ -12,7 +12,7 @@ import { useNavigate } from 'react-router-dom';
 import { TbReceipt2 } from "react-icons/tb";
 
 function Nav() {
-    const { city, userData, cartItems,pendingOrdersCount } = useSelector(state => state.user);
+    const { city, userData, cartItems, pendingOrdersCount, shop } = useSelector(state => state.user);
     const [showSearch, setShowSearch] = useState(false);
     const [showInfo, setShowInfo] = useState(false);
     const navigate = useNavigate();
@@ -30,26 +30,60 @@ function Nav() {
         }
     };
 
-    const handleSearchItems = async () => {
-        try {
-            const result = await axios.get(
-                `${serverUrl}/api/user/search-items?city=${city}&query=${input}`,
-                { withCredentials: true }
-            );
-            dispatch(setSearchItems(result.data));
-        } catch (error) {
-            dispatch(setSearchItems(null));
-            console.log(error);
-        }
-    };
+    // const handleSearchItems = async () => {
+    //     try {
+    //         const result = await axios.get(
+    //             `${serverUrl}/api/user/search-items?city=${city}&query=${input}`,
+    //             { withCredentials: true }
+    //         );
+    //         console.log(input);
+    //         console.log(result.data);
+    //         dispatch(setSearchItems(result.data));
+    //     } catch (error) {
+    //         dispatch(setSearchItems(null));
+    //         console.log(error);
+    //     }
+    // };
 
     useEffect(() => {
-        if (input) {
-            handleSearchItems();
-        } else {
-            dispatch(setSearchItems(null));
-        }
+        let isActive = true;
+
+        const fetchData = async () => {
+            if (input.trim()) {
+                try {
+                    const result = await axios.get(
+                        `${serverUrl}/api/user/search-items?city=${city}&query=${input}`,
+                        { withCredentials: true }
+                    );
+                    if (isActive) {
+                        dispatch(setSearchItems(result.data));
+                    }
+                } catch (error) {
+                    if (isActive) {
+                        dispatch(setSearchItems(null));
+                    }
+                    console.log(error);
+                }
+            } else {
+                dispatch(setSearchItems(null));
+            }
+        };
+
+        fetchData();
+
+        return () => { 
+            isActive = false;
+        };
     }, [input]);
+
+
+    // useEffect(() => {
+    //     if (input) {
+    //         handleSearchItems();
+    //     } else {
+    //         dispatch(setSearchItems(null));
+    //     }
+    // }, [input]);
 
     return (
         <div className="w-full h-[80px] flex items-center justify-between md:justify-center gap-[30px] px-[20px] fixed top-0 z-[9999] bg-[#fff9f6] overflow-visible">
@@ -94,7 +128,7 @@ function Nav() {
                             type="text"
                             placeholder="search delicious food..."
                             className="px-[10px] text-gray-700 outline-0 w-full"
-                             onChange={(e) => setInput(e.target.value)}
+                            onChange={(e) => setInput(e.target.value)}
                             value={input}
                         />
                     </div>
@@ -116,19 +150,23 @@ function Nav() {
                 {userData?.role === "owner" ? (
                     <>
                         {/* Add Food Item */}
-                        <button
-                            onClick={() => navigate("/additem")}
-                            className="hidden md:flex items-center gap-1 p-2 cursor-pointer rounded-full bg-[#ff4d2d]/10 text-[#ff4d2d]"
-                        >
-                            <FiPlus size={16} />
-                            <span className="text-sm font-medium">Add Food Item</span>
-                        </button>
-                        <button
-                            onClick={() => navigate("/additem")}
-                            className="flex md:hidden items-center justify-center p-2 cursor-pointer rounded-full bg-[#ff4d2d]/10 text-[#ff4d2d]"
-                        >
-                            <FiPlus size={18} />
-                        </button>
+                        {shop &&
+                            <>
+                                <button
+                                    onClick={() => navigate("/additem")}
+                                    className="hidden md:flex items-center gap-1 p-2 cursor-pointer rounded-full bg-[#ff4d2d]/10 text-[#ff4d2d]"
+                                >
+                                    <FiPlus size={16} />
+                                    <span className="text-sm font-medium">Add Food Item</span>
+                                </button>
+                                <button
+                                    onClick={() => navigate("/additem")}
+                                    className="flex md:hidden items-center justify-center p-2 cursor-pointer rounded-full bg-[#ff4d2d]/10 text-[#ff4d2d]"
+                                >
+                                    <FiPlus size={18} />
+                                </button>
+                            </>
+                        }
 
                         {/* Pending Orders */}
                         <div
@@ -147,7 +185,7 @@ function Nav() {
                         >
                             <TbReceipt2 className="w-[22px] h-[22px]" />
                             <span className="absolute -right-1 -top-1 text-[10px] font-bold text-white bg-[#ff4d2d] rounded-full px-[4px] py-[0px]">
-                              {pendingOrdersCount}
+                                {pendingOrdersCount}
                             </span>
                         </div>
                     </>

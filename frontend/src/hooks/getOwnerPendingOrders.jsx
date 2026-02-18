@@ -24,7 +24,7 @@ function useOwnerPendingOrders() {
       socket?.on("orders:new", (data) => {
         if (data.ownerId === userData._id) {
           dispatch(setOwnerPendingOrders(data.order));
-         
+         console.log("owner order:",data.order);
         }
       });
 

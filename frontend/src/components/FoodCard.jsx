@@ -12,20 +12,21 @@ import { useDispatch, useSelector } from "react-redux";
 import { addToCart, updateQuantity } from "../redux/userSlice";
 
 function FoodCard({ data }) {
+  //console.log("data",data);
   const [quantity, setQuantity] = useState(0);
-  const {cartItems}=useSelector(state=>state.user)
-  const dispatch=useDispatch()
-const handleIncrease = () => {
+  const { cartItems } = useSelector(state => state.user)
+  const dispatch = useDispatch()
+  const handleIncrease = () => {
     const newQty = quantity + 1;
     setQuantity(newQty);
-    dispatch(updateQuantity({ id: data._id, quantity: newQty }));
+    //dispatch(updateQuantity({ id: data._id, quantity: newQty }));
   };
 
   const handleDecrease = () => {
     if (quantity > 0) {
       const newQty = quantity - 1;
       setQuantity(newQty);
-      dispatch(updateQuantity({ id: data._id, quantity: newQty }));
+      //dispatch(updateQuantity({ id: data._id, quantity: newQty }));
     }
   };
 
@@ -34,7 +35,7 @@ const handleIncrease = () => {
       dispatch(addToCart({
         id: data._id,
         name: data.name,
-        shop:data.shop,
+        shop: data.shop,
         price: data.price,
         quantity,
         image: data.image,
@@ -113,7 +114,7 @@ const handleIncrease = () => {
             >
               <FaPlus size={12} />
             </button>
-            <button className={`${cartItems.some(i=>i.id==data._id)?"bg-gray-700":"bg-[#ff4d2d]"} text-white px-3 py-2 transition-colors`} onClick={handleAddToCart}>
+            <button className={`${cartItems.some(i => i.id == data._id) ? "bg-gray-700" : "bg-[#ff4d2d]"} text-white px-3 py-2 cursor-pointer transition-colors`} onClick={handleAddToCart}>
               <FaShoppingCart size={14} />
             </button>
           </div>

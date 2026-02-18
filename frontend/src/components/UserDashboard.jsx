@@ -5,12 +5,13 @@ import { FaChevronLeft, FaChevronRight } from 'react-icons/fa';
 import CategoryCard from './categoryCard';
 import FoodCard from './FoodCard';
 import { useSelector } from 'react-redux';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom'; 
 
 function UserDashboard() {
-  const { city, shopsOfCity, itemsOfCity, searchItems } = useSelector(
+  const { city, shopsOfCity, itemsOfCity, searchItems, userData } = useSelector(
     (state) => state.user
   );
+  //console.log(itemsOfCity);
   const navigate = useNavigate();
   const cateScrollRef = useRef(null);
   const shopScrollRef = useRef(null);
@@ -19,6 +20,7 @@ function UserDashboard() {
   const [showCateRight, setShowCateRight] = useState(false);
   const [showShopLeft, setShowShopLeft] = useState(false);
   const [showShopRight, setShowShopRight] = useState(false);
+ 
 
   const handleFilter = (category) => {
     if (category === 'All') {
@@ -184,7 +186,7 @@ function UserDashboard() {
             No Items Found
           </div>
         )}
-      </div>
+      </div> 
     </div>
   );
 }

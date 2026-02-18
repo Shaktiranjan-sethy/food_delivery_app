@@ -8,8 +8,8 @@ import User from "../models/user.model.js";
 import Razorpay from "razorpay"
 
 let instance = new Razorpay({
-  key_id:process.env.RAZORPAY_KEY_ID,
-  key_secret:process.env.RAZORPAY_KEY_SECRET,
+  key_id: process.env.RAZORPAY_KEY_ID,
+  key_secret: process.env.RAZORPAY_KEY_SECRET,
 });
 
 
@@ -66,9 +66,10 @@ export const placeOrder = async (req, res) => {
       })
     );
 
+
     // 🟢 Total + Delivery Fee
     let totalAmount = shopOrders.reduce((sum, so) => sum + so.subtotal, 0);
-   
+
 
     console.log("✅ Total Amount to charge:", totalAmount);
 
@@ -112,6 +113,27 @@ export const placeOrder = async (req, res) => {
     user.orders.push(newOrder._id);
     await user.save();
 
+    const io = req.app.get("io");
+    const order = await Order.findById(newOrder._id)
+      .sort({ createdAt: -1 })
+      .populate("user");
+
+    if (io) {
+      order.shopOrders.forEach(shopOrder => {
+        io.emit("orders:new", {
+          ownerId: shopOrder.owner.toString(),
+          order: {
+            _id: order._id,
+            user: order.user,
+            address: order.address,
+            paymentMethod: order.paymentMethod,
+            createdAt: order.createdAt,
+            shopOrder,
+          },
+        });
+      });
+    }
+
     return res.status(201).json({ success: true, order: newOrder });
   } catch (error) {
     console.error("❌ Place order error:", error);
@@ -133,33 +155,36 @@ export const verifyRazorpay = async (req, res) => {
     }
 
     // 🔹 Update order
-    const order = await Order.findById(orderId);
+    const order = await Order.findById(orderId)
+      .sort({ createdAt: -1 })
+      .populate("user");
     if (!order) return res.status(404).json({ success: false, message: "Order not found" });
 
     order.payment = true;
     order.razorpayPaymentId = razorpay_payment_id;
 
     order.shopOrders.forEach(shopOrder => {
-  shopOrder.status = "pending";
-});
+      shopOrder.status = "pending";
+    });
 
     await order.save();
     const io = req.app.get("io");
-if (io) {
-  order.shopOrders.forEach(shopOrder => {
-    io.emit("orders:new", {
-      ownerId: shopOrder.owner.toString(),
-      order: {
-        _id: order._id,
-        user: order.user,
-        address: order.address,
-        paymentMethod: order.paymentMethod,
-        createdAt: order.createdAt,
-        shopOrder,
-      },
-    });
-  });
-}
+
+    if (io) {
+      order.shopOrders.forEach(shopOrder => {
+        io.emit("orders:new", {
+          ownerId: shopOrder.owner.toString(),
+          order: {
+            _id: order._id,
+            user: order.user,
+            address: order.address,
+            paymentMethod: order.paymentMethod,
+            createdAt: order.createdAt,
+            shopOrder,
+          },
+        });
+      });
+    }
 
     return res.status(200).json({
       success: true,
@@ -181,10 +206,10 @@ export const getMyOrders = async (req, res) => {
       .populate("shopOrders.owner", "name email mobile")
       .populate("shopOrders.items.item", "name price image");
 
-  return  res.json({ success: true, orders });
+    return res.json({ success: true, orders });
   } catch (error) {
     console.error("Error fetching my orders:", error);
-   return res.status(500).json({ success: false, message: error.message });
+    return res.status(500).json({ success: false, message: error.message });
   }
 };
 
@@ -194,7 +219,7 @@ export const getOwnerOrders = async (req, res) => {
 
     // Sabhi orders find karo jisme shopOrders me owner match karta ho
     const orders = await Order.find({ "shopOrders.owner": ownerId })
-    .sort({ createdAt: -1 }) 
+      .sort({ createdAt: -1 })
       .populate("user") // Customer info
       .populate("shopOrders.shop", "name")  // Shop name
       .populate("shopOrders.items.item", "name image")
@@ -230,6 +255,7 @@ export const updateOwnerOrderStatus = async (req, res) => {
       .populate("shopOrders.shop", "name")
       .populate("shopOrders.assignedDeliveryBoy", "fullName name mobile");
 
+    // console.log("orderz:",order);
     if (!order) {
       return res.status(404).json({ success: false, message: "Order not found" });
     }
@@ -314,6 +340,7 @@ export const updateOwnerOrderStatus = async (req, res) => {
         availableBoys.forEach(b => {
           if (b.socketId && io) {
             io.to(b.socketId).emit("delivery:newAssignment", {
+              sentTo: b._id,
               assignmentId: assignment._id,
               orderId: order._id,
               shopId,
@@ -335,23 +362,23 @@ export const updateOwnerOrderStatus = async (req, res) => {
     await order.save();
 
     // repopulate
-  
-order = await Order.findById(orderId)
-  .populate("shopOrders.shop", "name")
-  .populate("shopOrders.assignedDeliveryBoy", "fullName name mobile");
 
-const updatedShopOrder = order.shopOrders.find(
-  so => so.shop._id.toString() === shopId
-);
+    order = await Order.findById(orderId)
+      .populate("shopOrders.shop", "name")
+      .populate("shopOrders.assignedDeliveryBoy", "fullName name mobile");
 
-// 🔹 Yahi emit karna hai
-const io = req.app.get("io");
-if (io) {
-  io.emit("orders:statusUpdated", {
-    shopOrder: updatedShopOrder,
-    orderId: order._id
-  });
-}
+    const updatedShopOrder = order.shopOrders.find(
+      so => so.shop._id.toString() === shopId
+    );
+
+    // 🔹 Yahi emit karna hai
+    const io = req.app.get("io");
+    if (io) {
+      io.emit("orders:statusUpdated", {
+        shopOrder: updatedShopOrder,
+        orderId: order._id
+      });
+    }
 
     return res.json({
       success: true,
@@ -364,7 +391,7 @@ if (io) {
   }
 
 
-   catch (error) {
+  catch (error) {
     console.error("Update order status error:", error);
     return res.status(500).json({ success: false, message: error.message });
   }
@@ -535,9 +562,9 @@ export const getCurrentOrder = async (req, res) => {
       Number.isFinite(Number(assignment.order.address.latitude)) &&
       Number.isFinite(Number(assignment.order.address.longitude)))
       ? {
-          lat: Number(assignment.order.address.latitude),
-          lng: Number(assignment.order.address.longitude),
-        }
+        lat: Number(assignment.order.address.latitude),
+        lng: Number(assignment.order.address.longitude),
+      }
       : null;
 
     return res.json({
@@ -613,7 +640,7 @@ export const updateDeliveryBoyLocation = async (req, res) => {
 
 
 
-export const myLocation= async (req, res) => {
+export const myLocation = async (req, res) => {
   try {
     const user = await User.findById(req.userId);
     if (!user || !user.location) {
@@ -760,12 +787,12 @@ export const verifyDeliveryOtp = async (req, res) => {
     shopOrder.status = "delivered";
     shopOrder.deliveryOtp = null;
     shopOrder.otpExpiresAt = null;
-    shopOrder.deliveredAt = new Date(); 
+    shopOrder.deliveredAt = new Date();
     await order.save();   // ✅ parent ko save karo
-    const assignment=await DeliveryAssignment.deleteOne({
-      shopOrderId:shopOrder._id,
-      order:order._id,
-      assignedTo:shopOrder.assignedDeliveryBoy
+    const assignment = await DeliveryAssignment.deleteOne({
+      shopOrderId: shopOrder._id,
+      order: order._id,
+      assignedTo: shopOrder.assignedDeliveryBoy
     })
 
     return res.json({ success: true, message: "Order delivered successfully" });

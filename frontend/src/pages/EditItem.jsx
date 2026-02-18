@@ -8,18 +8,18 @@ import { useDispatch, useSelector } from "react-redux";
 import { setShop } from "../redux/userSlice";
 import getCurrentShop from "../hooks/getCurrentShop";
 export default function EditItem() {
-const {shop}=useSelector(state=>state.user)
+  const { shop } = useSelector(state => state.user)
 
-const {itemId}=useParams()
-const [selectedItem,setSelectedItem]=useState(null)
-const [name, setName] = useState("")
-    const [price, setPrice] = useState(0)
-    const [category,setCategory] = useState("")
-    const [type, setType] = useState("veg")
-    const [frontendImage, setFrontendImage] = useState(null)
- const [backendImage, setBackendImage] = useState(null)
-const navigate=useNavigate()
-const dispatch=useDispatch()
+  const { itemId } = useParams()
+  const [selectedItem, setSelectedItem] = useState(null)
+  const [name, setName] = useState("")
+  const [price, setPrice] = useState(0)
+  const [category, setCategory] = useState("")
+  const [type, setType] = useState("veg")
+  const [frontendImage, setFrontendImage] = useState(null)
+  const [backendImage, setBackendImage] = useState(null)
+  const navigate = useNavigate()
+  const dispatch = useDispatch()
   const categories = [
     "Snacks",
     "Main Course",
@@ -34,62 +34,62 @@ const dispatch=useDispatch()
     "Others",
   ];
 
-  const handleImage=(e)=>{
-    const file=e.target.files[0]
+  const handleImage = (e) => {
+    const file = e.target.files[0]
     setBackendImage(file)
     setFrontendImage(URL.createObjectURL(file))
   }
 
-  const handleSubmit =async (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-   try {
-    const formData=new FormData()
-    formData.append("name",name)
-    formData.append("price",price)
-    formData.append("type",type)
-    formData.append("category",category)
-    formData.append("image",backendImage)
+    try {
+      const formData = new FormData()
+      formData.append("name", name)
+      formData.append("price", price)
+      formData.append("type", type)
+      formData.append("category", category)
+      formData.append("image", backendImage)
 
-const result=await axios.post(`${serverUrl}/api/item/edititem/${itemId}`,formData,{withCredentials:true})
-const updatedItem=result.data
-const updatedItems=shop.items.map(item=>item._id==updatedItem._id?updatedItem:item)
-console.log(updatedItems)
-dispatch(setShop({...shop,items:updatedItems}))
-navigate("/")
-   } catch (error) {
-    console.log(error)
-   }
+      const result = await axios.post(`${serverUrl}/api/item/edititem/${itemId}`, formData, { withCredentials: true })
+      const updatedItem = result.data
+      const updatedItems = shop.items.map(item => item._id == updatedItem._id ? updatedItem : item)
+      console.log(updatedItems)
+      dispatch(setShop({ ...shop, items: updatedItems }))
+      navigate("/")
+    } catch (error) {
+      console.log(error)
+    }
   };
 
-  const fetchSelectedItem=async ()=>{
+  const fetchSelectedItem = async () => {
     try {
-       
-    const result=await axios.get(`${serverUrl}/api/item/getbyid/${itemId}`,{withCredentials:true})
-setSelectedItem(result.data)
+
+      const result = await axios.get(`${serverUrl}/api/item/getbyid/${itemId}`, { withCredentials: true })
+      setSelectedItem(result.data)
     } catch (error) {
-       console.log(error) 
+      console.log(error)
     }
   }
 
-  useEffect(()=>{
-fetchSelectedItem()
-  },[])
+  useEffect(() => {
+    fetchSelectedItem()
+  }, [])
 
-  useEffect(()=>{
-if(selectedItem){
-    setName(selectedItem.name)
-    setPrice(selectedItem.price)
-    setFrontendImage(selectedItem.image)
-    setCategory(selectedItem.category)
-    setType(selectedItem.type)
-}
-  },[selectedItem])
+  useEffect(() => {
+    if (selectedItem) {
+      setName(selectedItem.name)
+      setPrice(selectedItem.price)
+      setFrontendImage(selectedItem.image)
+      setCategory(selectedItem.category)
+      setType(selectedItem.type)
+    }
+  }, [selectedItem])
 
   return (
     <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-[#fff0ec] to-white p-6">
-          <div className='absolute top-[20px] left-[20px] z-[10] mb-[10px]' onClick={()=>navigate("/")}>
-                        <MdKeyboardBackspace className='w-[25px] h-[25px] text-[#ff4d2d]'/>
-                       </div>
+      <div className='absolute top-[20px] left-[20px] z-[10] mb-[10px] cursor-pointer' onClick={() => navigate("/")}>
+        <MdKeyboardBackspace className='w-[25px] h-[25px] text-[#ff4d2d]' />
+      </div>
       <form
         onSubmit={handleSubmit}
         className="bg-white border border-[#ff4d2d33] shadow-lg rounded-xl p-8 max-w-lg w-full space-y-6"
@@ -105,7 +105,7 @@ if(selectedItem){
             name="name"
             value={name}
             placeholder="Enter Food Name"
-            onChange={(e)=>setName(e.target.value)}
+            onChange={(e) => setName(e.target.value)}
             required
             className="w-full border border-gray-300 rounded-lg p-3 focus:ring-2 focus:ring-[#ff4d2d] focus:outline-none"
           />
@@ -117,7 +117,7 @@ if(selectedItem){
             type="number"
             name="price"
             value={price}
-            onChange={(e)=>setPrice(e.target.value)}
+            onChange={(e) => setPrice(e.target.value)}
             required
             min="0"
             className="w-full border border-gray-300 rounded-lg p-3 focus:ring-2 focus:ring-[#ff4d2d] focus:outline-none"
@@ -128,8 +128,8 @@ if(selectedItem){
           <label className="block text-gray-700 font-medium mb-1">Category</label>
           <select
             name="category"
-             value={category}
-            onChange={(e)=>setCategory(e.target.value)}
+            value={category}
+            onChange={(e) => setCategory(e.target.value)}
             required
             className="w-full border border-gray-300 rounded-lg p-3 focus:ring-2 focus:ring-[#ff4d2d] focus:outline-none"
           >
@@ -142,13 +142,13 @@ if(selectedItem){
           </select>
         </div>
 
-         <div>
+        <div>
           <label className="block text-gray-700 font-medium mb-1">Image</label>
           <input
             type="file"
             name="image"
             accept="image/*"
-           onChange={handleImage}
+            onChange={handleImage}
             className="w-full border border-gray-300 rounded-lg p-3 focus:ring-2 focus:ring-[#ff4d2d] focus:outline-none"
           />
           {frontendImage && (
@@ -165,7 +165,7 @@ if(selectedItem){
           <select
             name="type"
             value={type}
-            onChange={(e)=>setType(e.target.value)}
+            onChange={(e) => setType(e.target.value)}
             required
             className="w-full border border-gray-300 rounded-lg p-3 focus:ring-2 focus:ring-[#ff4d2d] focus:outline-none"
           >
