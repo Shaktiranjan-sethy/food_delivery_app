@@ -3,7 +3,7 @@
 import DeliveryAssignment from "./models/deliveryAssignment.model.js";
 import User from "./models/user.model.js";
 
- // if you use JWT for socket auth (optional)
+// if you use JWT for socket auth (optional)
 
 export default function socketHandler(io) {
   io.on("connection", (socket) => {
@@ -44,6 +44,15 @@ export default function socketHandler(io) {
       } catch (err) {
         console.error("delivery:location:update error", err);
       }
+    });
+
+    socket.on("chat:joinRoom", ({ orderId }) => {
+      socket.join(`order_${orderId}`);
+      console.log(`Socket ${socket.id} joined room order_${orderId}`);
+    });
+
+    socket.on("chat:leaveRoom", ({ orderId }) => {
+      socket.leave(`order_${orderId}`);
     });
 
     socket.on("disconnect", async () => {

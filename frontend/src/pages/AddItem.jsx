@@ -23,7 +23,7 @@ export default function AddItem() {
   const navigate = useNavigate()
   const dispatch = useDispatch()
   const categories = [
-    "Snacks",
+    "Starter",
     "Main Course",
     "Desserts",
     "Pizza",

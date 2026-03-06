@@ -13,14 +13,14 @@ const itemSchema = new mongoose.Schema(
     },
     price: {
       type: Number,
-      required:true,
+      required: true,
       min: 0
     },
     category: {
       type: String,
       required: true,
-       enum: [
-        "Snacks",
+      enum: [
+        "Starter",
         "Main Course",
         "Desserts",
         "Pizza",
@@ -45,14 +45,23 @@ const itemSchema = new mongoose.Schema(
       average: { type: Number, default: 0 },
       count: { type: Number, default: 0 }
     },
-    type:{
-     type: String,
-     enum:["veg","non veg"]
-  }
+    reviews: [
+      {
+        user: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
+        userName: { type: String },
+        rating: { type: Number, min: 1, max: 5 },
+        comment: { type: String },
+        createdAt: { type: Date, default: Date.now }
+      }
+    ],
+    type: {
+      type: String,
+      enum: ["veg", "non veg"]
+    }
   },
-  
+
   { timestamps: true }
 );
 
- const Item=mongoose.model("Item", itemSchema);
- export default Item
+const Item = mongoose.model("Item", itemSchema);
+export default Item

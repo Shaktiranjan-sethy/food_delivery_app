@@ -27,6 +27,7 @@ import updateLocation from './hooks/updateLocation'
 import TrackOrderPage from './pages/TrackOrderPage'
 import MyDeliveredOrders from './pages/MyDeliveredOrders'
 import ShopItems from './pages/ShopItems'
+import RateOrder from './pages/RateOrder'
 export const serverUrl = "http://localhost:8000"
 
 function App() {
@@ -75,6 +76,7 @@ function App() {
       <Route path='/my-delivered-orders' element={userData ? <MyDeliveredOrders /> : <Navigate to={"/signin"} />} />
       <Route path='/track-order/:orderId' element={userData ? <TrackOrderPage /> : <Navigate to={"/signin"} />} />
       <Route path='/shop-items/:shopId' element={userData ? <ShopItems /> : <Navigate to={"/signin"} />} />
+      <Route path='/rate-order' element={userData ? <RateOrder /> : <Navigate to={"/signin"} />} />
     </Routes>
   )
 }

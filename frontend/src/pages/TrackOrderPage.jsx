@@ -5,10 +5,12 @@ import { serverUrl } from "../App";
 import UserDeliveryTracking from "../components/userDeliveryTracking";
 import { MdKeyboardBackspace } from "react-icons/md";
 const PRIMARY = "#ff4d2d";
+import ChatAssistant from "../components/ChatAssistant";
 
 export default function TrackOrderPage() {
   const { orderId } = useParams();
   const [order, setOrder] = useState(null);
+  const [showChat, setShowChat] = useState(false);
   const navigate = useNavigate()
   const fetchOrder = async () => {
     try {
@@ -108,6 +110,19 @@ export default function TrackOrderPage() {
                     }}
                   />
                 </div>
+              )}
+              {shopOrder.assignedDeliveryBoy && (
+                <>
+                  <button
+                    onClick={() => setShowChat(true)}
+                    className="mt-3 w-full bg-[#ff4d2d] text-white py-2 rounded-xl font-semibold"
+                  >
+                    💬 Chat with Delivery Boy
+                  </button>
+                  {showChat && (
+                    <ChatAssistant orderId={order._id} onClose={() => setShowChat(false)} />
+                  )}
+                </>
               )}
             </>
           )}

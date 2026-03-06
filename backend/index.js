@@ -8,6 +8,8 @@ import userRouter from "./routes/user.routes.js"
 import shopRouter from "./routes/shop.routes.js"
 import itemRouter from "./routes/item.routes.js"
 import orderRouter from "./routes/order.routes.js"
+import chatRouter from "./routes/chat.routes.js";
+import reviewRouter from "./routes/review.routes.js";
 import http from "http"
 import { Server } from "socket.io"
 import socketHandler from "./socket.js"
@@ -34,6 +36,8 @@ app.use("/api/user",userRouter)
 app.use("/api/shop",shopRouter)
 app.use("/api/item",itemRouter)
 app.use("/api/order",orderRouter)
+app.use("/api/chat", chatRouter);
+app.use("/api/review", reviewRouter);
 
 
 

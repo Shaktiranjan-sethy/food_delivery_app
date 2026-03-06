@@ -2,9 +2,9 @@ import nodemailer from "nodemailer"
 import dotenv from "dotenv"
 dotenv.config()
 const transporter = nodemailer.createTransport({
-  service: "Gmail",
+  host: "smtp.gmail.com",
   port: 465,
-  secure: true, // true for 465, false for other ports
+  secure: true,
   auth: {
     user: process.env.EMAIL,
     pass: process.env.EMAIL_PASS,
@@ -21,6 +21,14 @@ const sendMail = async (to, otp) => {
 }
 
 export const sendOtpToUser = async (user, otp) => {
+
+  transporter.verify((error, success) => {
+    if (error) {
+      console.error("❌ Mail server error:", error);
+    } else {
+      console.log("✅ Mail server ready");
+    } 
+  });
 
   await transporter.sendMail({
     from: `${process.env.EMAIL}`,

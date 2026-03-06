@@ -89,7 +89,7 @@ function FoodCard({ data }) {
         <div className="flex items-center gap-1 mt-1">
           {renderStars(Math.round(data.rating?.average || 0))}
           <span className="text-xs text-gray-500">
-            ({data.rating?.count || 0})
+            ({data.rating?.count || 0} reviews)  
           </span>
         </div>
 

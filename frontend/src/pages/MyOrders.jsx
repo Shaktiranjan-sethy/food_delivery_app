@@ -5,10 +5,13 @@ import { serverUrl } from "../App";
 import { useDispatch, useSelector } from "react-redux";
 import { setMyOrders } from "../redux/userSlice";
 import { MdKeyboardBackspace } from "react-icons/md";
+import ReviewModal from "../components/ReviewModal";
 
 export default function MyOrders() {
   const { myOrders, socket } = useSelector((state) => state.user);
   const [loading, setLoading] = useState(true);
+  const [selectedItem, setSelectedItem] = useState(null);
+  const [reviewedItems, setReviewedItems] = useState(new Set()); // track reviewed items
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
@@ -20,7 +23,7 @@ export default function MyOrders() {
         });
         if (res.data.success) {
           dispatch(setMyOrders(res.data.orders));
-          console.log(res.data.orders);
+          console.log("order items:", res.data.orders)
         }
       } catch (err) {
         console.error("Error fetching orders:", err);
@@ -29,6 +32,26 @@ export default function MyOrders() {
       }
     };
     fetchOrders();
+  }, []);
+
+  // fetch already reviewed items so we can hide the rate button
+  useEffect(() => {
+    const fetchReviewableItems = async () => {
+      try {
+        const res = await axios.get(`${serverUrl}/api/review/reviewable-items`, {
+          withCredentials: true,
+        });
+        if (res.data.success) {
+          console.log("reviewable items:", res.data);
+          const itemIds = res.data.items.map(i => i.item?._id);
+          //console.log("ids:", itemIds);
+          setReviewedItems(new Set(itemIds));
+        }
+      } catch (err) {
+        console.error(err);
+      }
+    };
+    fetchReviewableItems();
   }, []);
 
   // socket listener
@@ -62,6 +85,11 @@ export default function MyOrders() {
       month: "short",
       year: "numeric",
     });
+  };
+
+  // called after review submitted successfully
+  const handleReviewSuccess = (itemId) => {
+    setReviewedItems((prev) => new Set([...prev, itemId]));
   };
 
   if (!loading && myOrders?.length === 0) {
@@ -131,24 +159,54 @@ export default function MyOrders() {
 
                   {/* Items */}
                   <div className="flex space-x-4 overflow-x-auto pb-2">
-                    {shopOrder.items.map((item) => (
-                      <div
-                        key={item?._id}
-                        className="flex-shrink-0 w-40 border rounded-lg p-2 bg-white"
-                      >
-                        <img
-                          src={item?.item?.image || "/placeholder.png"}
-                          alt={item?.name}
-                          className="w-full h-24 object-cover rounded"
-                        />
-                        <p className="text-sm font-semibold mt-1">
-                          {item?.name}
-                        </p>
-                        <p className="text-xs text-gray-500">
-                          Qty: {item?.quantity} × ₹{item?.price}
-                        </p>
-                      </div>
-                    ))}
+                    {shopOrder.items.map((item) => {
+                      const itemId = item?.item?._id;
+                      const isDelivered = shopOrder?.status === "delivered";
+                      const alreadyRated = reviewedItems.has(itemId);
+
+                      return (
+                        <div
+                          key={item?._id}
+                          className="flex-shrink-0 w-40 border rounded-lg p-2 bg-white"
+                        >
+                          <img
+                            src={item?.item?.image || "/placeholder.png"}
+                            alt={item?.name}
+                            className="w-full h-24 object-cover rounded"
+                          />
+                          <p className="text-sm font-semibold mt-1">
+                            {item?.name}
+                          </p>
+                          <p className="text-xs text-gray-500">
+                            Qty: {item?.quantity} × ₹{item?.price}
+                          </p>
+
+                          {/* ✅ Rate button per item */}
+                          {isDelivered && itemId && !alreadyRated && (
+                            <button
+                              onClick={() =>
+                                setSelectedItem({
+                                  _id: itemId,
+                                  name: item?.name,
+                                  price: item?.price,
+                                  image: item?.item?.image,
+                                })
+                              }
+                              className="mt-2 w-full bg-yellow-400 hover:bg-yellow-500 text-white text-xs py-1 rounded-lg font-semibold"
+                            >
+                              ⭐ Rate
+                            </button>
+                          )}
+
+                          {/* ✅ Already rated badge */}
+                          {isDelivered && alreadyRated && (
+                            <p className="mt-2 text-center text-xs text-green-600 font-semibold">
+                              ✅ Rated
+                            </p>
+                          )}
+                        </div>
+                      );
+                    })}
                   </div>
 
                   {/* Shop Subtotal */}
@@ -184,6 +242,18 @@ export default function MyOrders() {
           ))}
         </div>
       </div>
+
+      {/* ✅ Review Modal - opens directly on this page */}
+      {selectedItem && (
+        <ReviewModal
+          item={selectedItem}
+          onClose={() => setSelectedItem(null)}
+          onSuccess={() => {
+            handleReviewSuccess(selectedItem._id);
+            setSelectedItem(null);
+          }}
+        />
+      )}
     </div>
   );
 }

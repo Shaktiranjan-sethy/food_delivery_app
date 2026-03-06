@@ -5,6 +5,7 @@ import { useSelector, useDispatch } from "react-redux";
 import Nav from "./Nav";
 import { serverUrl } from "../App";
 import DeliveryBoyTracking from "../pages/DeliveryBoyTracking";
+import ChatAssistant from "./ChatAssistant";
 import {
   BarChart,
   Bar,
@@ -13,7 +14,7 @@ import {
   Tooltip,
   ResponsiveContainer,
   CartesianGrid,
-} from "recharts"; 
+} from "recharts";
 
 const PRIMARY = "#ff4d2d";
 
@@ -25,6 +26,7 @@ export default function DeliveryBoy() {
   const { userData, socket } = useSelector((state) => state.user);
   const [showOtpBox, setShowOtpBox] = useState(false);
   const [otp, setOtp] = useState("");
+  const [showChat, setShowChat] = useState(false);
 
   const dispatch = useDispatch();
 
@@ -32,11 +34,11 @@ export default function DeliveryBoy() {
   //   console.log("UPDATED userData", userData);
   // }, [userData]);
 
-   
+
 
   if (!userData?._id) {
     return <div className="pt-[120px] text-gray-600">Loading dashboard...</div>;
-  }  
+  }
 
   // 🔹 Track browser GPS and update backend
   useEffect(() => {
@@ -152,6 +154,8 @@ export default function DeliveryBoy() {
 
   // 🔹 Send OTP request
   const sendOtp = async () => {
+    console.log("order id:",currentOrder._id);
+    console.log("shoporder id:",currentOrder.shopOrder._id);
     try {
       const res = await axios.post(
         `${serverUrl}/api/order/send-otp`,
@@ -250,6 +254,12 @@ export default function DeliveryBoy() {
             </div>
 
             <DeliveryBoyTracking currentOrder={currentOrder} />
+            <button onClick={() => setShowChat(true)} className="mt-2 w-full bg-blue-500 text-white py-2 rounded-xl">
+              💬 Chat with Customer
+            </button>
+            {showChat && (
+              <ChatAssistant orderId={currentOrder._id} onClose={() => setShowChat(false)} />
+            )}
 
             {!showOtpBox ? (
               <button
@@ -316,7 +326,7 @@ export default function DeliveryBoy() {
             </div>
           </div>
         )}
-      </div> 
+      </div>
     </div>
   );
 }

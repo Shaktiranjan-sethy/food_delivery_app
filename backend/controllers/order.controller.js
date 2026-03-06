@@ -750,7 +750,8 @@ export const sendDeliveryOtp = async (req, res) => {
     shopOrder.deliveryOtp = otp;
     shopOrder.otpExpiresAt = Date.now() + 5 * 60 * 1000; // 5 min expiry
     await order.save();   // ✅ parent ko save karo
-
+    // console.log(order.user);
+    // console.log(otp);
     // Send OTP to user (SMS / Email)
     await sendOtpToUser(order.user, otp);
 
