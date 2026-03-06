@@ -13,7 +13,7 @@ import { setShop, setSocket } from './redux/userSlice'
 import getCurrentShop from './hooks/getCurrentShop'
 
 import AddItem from './pages/AddItem'
-import EditItem from './pages/editItem'
+import EditItem from './pages/EditItem'
 import getShopsByCity from './hooks/getShopsByCity'
 import getItemsByCity from './hooks/getItemsByCity'
 import CartPage from './pages/CartPage'
