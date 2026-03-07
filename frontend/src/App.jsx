@@ -28,7 +28,7 @@ import TrackOrderPage from './pages/TrackOrderPage'
 import MyDeliveredOrders from './pages/MyDeliveredOrders'
 import ShopItems from './pages/ShopItems'
 import RateOrder from './pages/RateOrder'
-export const serverUrl = "http://localhost:8000"
+export const serverUrl = import.meta.env.VITE_SERVER_URL
 
 function App() {
   const { userData, allShops, socket } = useSelector(state => state.user)
