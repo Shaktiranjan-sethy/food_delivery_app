@@ -15,27 +15,38 @@ import { Server } from "socket.io"
 import socketHandler from "./socket.js"
 dotenv.config()
 const port = process.env.PORT || 5000
-const app=express()
-const server=http.createServer(app)
-const io=new Server(server,{
-     cors: {
-    origin: "http://localhost:5173", // production में specific domain डालना
-    methods: ["GET", "POST"],
-    credentials: true  
-  }
-})
+const app = express()
+const server = http.createServer(app)
+const allowedOrigins = [
+    "http://localhost:5173",
+    process.env.CLIENT_URL,
+    "http://127.0.0.1:5173"
+];
+const io = new Server(server, {
+    cors: {
+        origin: allowedOrigins,
+        methods: ["GET", "POST"],
+        credentials: true
+    }
+});
 app.set("io", io);
 app.use(cors({
-    origin:"http://localhost:5173",
-    credentials:true
-}))
+    origin: function (origin, callback) {
+        if (!origin || allowedOrigins.includes(origin)) {
+            callback(null, true);
+        } else {
+            callback(new Error("Not allowed by CORS"));
+        }
+    },
+    credentials: true
+}));
 app.use(express.json())
 app.use(cookieParser())
-app.use("/api/auth",authRouter)
-app.use("/api/user",userRouter)
-app.use("/api/shop",shopRouter)
-app.use("/api/item",itemRouter)
-app.use("/api/order",orderRouter)
+app.use("/api/auth", authRouter)
+app.use("/api/user", userRouter)
+app.use("/api/shop", shopRouter)
+app.use("/api/item", itemRouter)
+app.use("/api/order", orderRouter)
 app.use("/api/chat", chatRouter);
 app.use("/api/review", reviewRouter);
 
@@ -46,7 +57,7 @@ socketHandler(io)
 
 
 
-server.listen(port,()=>{
+server.listen(port, () => {
     console.log(`server started at ${port}`)
     connectDb()
 })
